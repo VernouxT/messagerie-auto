@@ -68,7 +68,7 @@ def extract_fields_with_ai(raw_text: str) -> dict:
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "job_type": {"type": "string", "enum": ["fuite", "wc", "chauffe-eau", "debouchage", "srting"]},
+            "job_type": {"type": "string"},
             "address": {"type": "string"},
             "urgency": {"type": "string", "enum": ["faible", "moyenne", "elevee"]},
         },
