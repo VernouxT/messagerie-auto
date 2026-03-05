@@ -4,8 +4,20 @@ from fastapi.responses import Response
 from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
+from contextlib import asynccontextmanager
+from sqlmodel import Session
 
-app = FastAPI()
+from db import engine, init_db, SmsRequest
+
+from contextlib import asynccontextmanager
+from db import init_db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 # Env vars
 TWILIO_ACCOUNT_SID = os.environ["TWILIO_ACCOUNT_SID"]
@@ -14,8 +26,7 @@ TWILIO_NUMBER      = os.environ["TWILIO_NUMBER"]  # ex: +33...
 
 twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-# Mini mémoire en RAM (ok pour test)
-sessions = {}  # from_number -> {"step": int, "data": {}}
+
 
 @app.post("/voice")
 async def voice(request: Request):
@@ -43,17 +54,12 @@ async def sms(request: Request):
     from_number = form.get("From")
     body = (form.get("Body") or "").strip()
 
-    sess = sessions.get(from_number, {"step": 0, "data": {}})
-    sessions[from_number] = sess
+    # On enregistre chaque SMS en base
+    with Session(engine) as session:
+        session.add(SmsRequest(from_number=from_number, raw_request=body))
+        session.commit()
 
     resp = MessagingResponse()
-
-    # MVP: 1 message libre, on stocke brut
-    if sess["step"] == 0:
-        sess["data"]["raw_request"] = body
-        sess["step"] = 1
-        resp.message("Merci ! Message reçu. Je vous recontacte rapidement")
-    else:
-        resp.message("Déjà reçu. Pour modifier: 'MODIFIER: ...' ou pour annuler: 'ANNULER'.")
+    resp.message("Merci ! Message reçu. Je vous recontacte rapidement")
 
     return Response(content=str(resp), media_type="application/xml")
