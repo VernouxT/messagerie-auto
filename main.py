@@ -63,3 +63,19 @@ async def sms(request: Request):
     resp.message("Merci ! Message reçu. Je vous recontacte rapidement")
 
     return Response(content=str(resp), media_type="application/xml")
+
+from sqlmodel import select
+
+@app.get("/messages")
+def get_messages():
+    with Session(engine) as session:
+        rows = session.exec(select(SmsRequest).order_by(SmsRequest.id.desc())).all()
+        return [
+            {
+                "id": r.id,
+                "from": r.from_number,
+                "message": r.raw_request,
+                "date": r.created_at
+            }
+            for r in rows
+        ]
