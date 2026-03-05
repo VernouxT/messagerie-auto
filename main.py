@@ -83,7 +83,7 @@ def extract_fields_with_ai(raw_text: str) -> dict:
                 "role": "system",
                 "content": (
                     "Tu aides un plombier. Analyse le SMS et retourne un JSON strict.\n"
-                    "job_type: fuite | wc | chauffe-eau | debouchage | autre ou estimée par toi\n"
+                    "job_type: estimée par toi\n"
                     "address: adresse complète si présente sinon \"\"\n"
                     "urgency: faible | moyenne | elevee (estimée par toi)\n"
                 ),
