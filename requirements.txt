@@ -4,3 +4,4 @@ twilio
 python-multipart
 sqlmodel
 psycopg2-binary
+requests
