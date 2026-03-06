@@ -127,7 +127,11 @@ async def voice(request: Request):
     from_number = form.get("From")
 
     vr = VoiceResponse()
-    vr.say("Bonjour. Désolé je n'ai pas pu vous répondre. Je vous envoie un SMS.")
+    vr.say(
+        "Bonjour. Désolé, je n'ai pas pu vous répondre. Je vous envoie un SMS.",
+        voice="Polly.Mathieu",
+        language="fr-FR"
+    )
     vr.hangup()
 
     twilio.messages.create(
