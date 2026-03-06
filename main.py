@@ -128,7 +128,7 @@ async def voice(request: Request):
 
     vr = VoiceResponse()
     vr.say(
-        "Bonjour. Désolé, je n'ai pas pu vous répondre. Je vous envoie un SMS.",
+        "Bonjour, plombier XXX. Je vous envoie un message je suis actuellement occupé, désolé. Je vous rappelle rapidement.",
         voice="Polly.Mathieu",
         language="fr-FR"
     )
